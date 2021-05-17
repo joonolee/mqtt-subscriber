@@ -1,11 +1,12 @@
 import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 import 'common/local_notification.dart';
 import 'common/mqtt_manager.dart';
 
 final mqttManager =
-    MqttManager(host: 'test.mosquitto.org', topic: 'diaconn/jhlee9652', identifier: 'jhlee2');
+    MqttManager(host: 'test.mosquitto.org', topic: 'diaconn/jhlee9652', identifier: Uuid().v4());
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
