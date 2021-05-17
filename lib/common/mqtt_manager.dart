@@ -1,7 +1,12 @@
+import 'dart:io';
+
+import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:mqtt_subscriber/common/local_notification.dart';
+import 'package:path_provider/path_provider.dart';
 
 class MqttManager {
   // Private instance of client
@@ -9,6 +14,27 @@ class MqttManager {
   final String _identifier;
   final String _host;
   final String _topic;
+  File file;
+
+  Future<String> get _localPath async {
+    Directory directory;
+    if (Platform.isAndroid) {
+      directory = await getExternalStorageDirectory();
+    } else {
+      directory = await getApplicationDocumentsDirectory();
+    }
+    Fimber.d('localPath: ${directory.path}');
+    return directory.path;
+  }
+
+  Future<void> get _localFile async {
+    final path = await _localPath;
+    file = File('$path/${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.txt');
+  }
+
+  Future<void> _writeDataToFile(String data) async {
+    file?.writeAsStringSync(data, mode: FileMode.append, flush: true);
+  }
 
   // Constructor
   MqttManager({@required String host, @required String topic, @required String identifier})
@@ -16,7 +42,8 @@ class MqttManager {
         _host = host,
         _topic = topic;
 
-  void initializeMQTTClient() {
+  void initializeMQTTClient() async {
+    await _localFile; // 파일 생성
     _client = MqttServerClient(_host, _identifier);
     _client.port = 1883;
     _client.keepAlivePeriod = 20;
@@ -78,12 +105,13 @@ class MqttManager {
   void onConnected() {
     print('EXAMPLE::Mosquitto client connected....');
     _client.subscribe(_topic, MqttQos.atLeastOnce);
-    _client.updates.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+    _client.updates.listen((List<MqttReceivedMessage<MqttMessage>> c) async {
       final MqttPublishMessage recMess = c[0].payload;
       final String pt = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
       print('EXAMPLE::Change notification:: topic is <${c[0].topic}>, payload is <-- $pt -->');
       print('');
       LocalNotification.show(title: 'MQTT 메시지 수신', body: pt);
+      await _writeDataToFile('${DateFormat('yyyyMMddHHmmss').format(DateTime.now())} $pt\n');
     });
     print('EXAMPLE::OnConnected client callback - Client connection was sucessful');
   }

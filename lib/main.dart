@@ -1,14 +1,17 @@
+import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
 
 import 'common/local_notification.dart';
 import 'common/mqtt_manager.dart';
 
+final mqttManager =
+    MqttManager(host: 'test.mosquitto.org', topic: 'diaconn/jhlee9652', identifier: 'jhlee2');
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Fimber.plantTree(DebugTree());
   await LocalNotification.init();
-  final mqttManager =
-      MqttManager(host: 'test.mosquitto.org', topic: 'diaconn/jhlee9652', identifier: 'jhlee2');
-  mqttManager.initializeMQTTClient();
+  await mqttManager.initializeMQTTClient();
   mqttManager.connect();
   runApp(MyApp());
 }
@@ -36,14 +39,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +48,14 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[Text('MQTT 메시지를 수신하고 있습니다.')],
+          children: <Widget>[
+            Text('MQTT수신로그는 아래 파일을 참조할것!'),
+            SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Text('${mqttManager.file?.toString()}'),
+            ),
+          ],
         ),
       ),
     );
