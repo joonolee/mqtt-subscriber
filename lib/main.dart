@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'common/mqtt_manager.dart';
 
 final mqttManager =
-    MqttManager(host: 'test.mosquitto.org', topic: 'diaconn/jhlee9652', identifier: 'jhlee');
+    MqttManager(host: 'test.mosquitto.org', topic: 'diaconn/jhlee9652', identifier: 'jhlee2');
 void main() {
   mqttManager.initializeMQTTClient();
   mqttManager.connect();
