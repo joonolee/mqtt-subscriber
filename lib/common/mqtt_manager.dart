@@ -50,6 +50,7 @@ class MqttManager {
     _client.onDisconnected = onDisconnected;
     _client.secure = false;
     _client.logging(on: true);
+    _client.autoReconnect = true;
 
     /// Add the successful connection callback
     _client.onConnected = onConnected;
