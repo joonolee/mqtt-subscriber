@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'common/local_notification.dart';
 import 'common/mqtt_manager.dart';
 
-final mqttManager =
-    MqttManager(host: 'test.mosquitto.org', topic: 'diaconn/jhlee9652', identifier: 'jhlee2');
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await LocalNotification.init();
+  final mqttManager =
+      MqttManager(host: 'test.mosquitto.org', topic: 'diaconn/jhlee9652', identifier: 'jhlee2');
   mqttManager.initializeMQTTClient();
   mqttManager.connect();
   runApp(MyApp());
