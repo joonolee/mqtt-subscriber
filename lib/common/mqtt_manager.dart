@@ -83,7 +83,7 @@ class MqttManager {
       final String pt = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
       print('EXAMPLE::Change notification:: topic is <${c[0].topic}>, payload is <-- $pt -->');
       print('');
-      LocalNotification.show(title: 'MQTT 메시지', body: pt);
+      LocalNotification.show(title: 'MQTT 메시지 수신', body: pt);
     });
     print('EXAMPLE::OnConnected client callback - Client connection was sucessful');
   }
