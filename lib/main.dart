@@ -1,5 +1,6 @@
 import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
+import 'package:move_to_background/move_to_background.dart';
 import 'package:uuid/uuid.dart';
 
 import 'common/local_notification.dart';
@@ -42,21 +43,28 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('MQTT수신로그는 아래 파일을 참조할것!'),
-            SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Text('${mqttManager.file?.toString()}'),
-            ),
-          ],
+    return WillPopScope(
+      onWillPop: () async {
+        print('MoveToBackground.moveTaskToBack()');
+        await MoveToBackground.moveTaskToBack();
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text('MQTT수신로그는 아래 파일을 참조할것!'),
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Text('${mqttManager.file?.toString()}'),
+              ),
+            ],
+          ),
         ),
       ),
     );
