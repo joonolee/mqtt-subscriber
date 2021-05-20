@@ -1,6 +1,9 @@
+import 'package:app_settings/app_settings.dart';
 import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:move_to_background/move_to_background.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
 
 import 'common/local_notification.dart';
@@ -41,6 +44,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Future<void> _onBattery() async {
+    if (await Permission.ignoreBatteryOptimizations.isGranted) {
+      await AppSettings.openBatteryOptimizationSettings();
+    } else {
+      final PermissionStatus status = await Permission.ignoreBatteryOptimizations.request();
+      if (status.isGranted) Fluttertoast.showToast(msg: '허용되었습니다.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -63,6 +75,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: const EdgeInsets.all(10),
                 child: Text('${mqttManager.file?.toString()}'),
               ),
+              TextButton(
+                onPressed: () => _onBattery(),
+                child: Text('배터리 최적화 예외'),
+              )
             ],
           ),
         ),
