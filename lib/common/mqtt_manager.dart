@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
-import 'package:mqtt_subscriber/common/local_notification.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'local_notification.dart';
 
 class MqttManager {
   // Private instance of client
@@ -42,7 +44,7 @@ class MqttManager {
         _host = host,
         _topic = topic;
 
-  void initializeMQTTClient() async {
+  Future<void> initializeMQTTClient() async {
     await _localFile; // 파일 생성
     _client = MqttServerClient(_host, _identifier);
     _client.port = 1883;
@@ -83,7 +85,9 @@ class MqttManager {
     _client.disconnect();
   }
 
-  void publish(String message) {
+  Future<void> publish(String message) async {
+    Fluttertoast.showToast(msg: '메시지 전송 : $message');
+    await _writeDataToFile('${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}---> $message\n');
     final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
     builder.addString(message);
     _client.publishMessage(_topic, MqttQos.exactlyOnce, builder.payload);
@@ -112,7 +116,7 @@ class MqttManager {
       print('EXAMPLE::Change notification:: topic is <${c[0].topic}>, payload is <-- $pt -->');
       print('');
       LocalNotification.show(title: 'MQTT 메시지 수신', body: pt);
-      await _writeDataToFile('${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}\t$pt\n');
+      await _writeDataToFile('${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}<--- $pt\n');
     });
     print('EXAMPLE::OnConnected client callback - Client connection was sucessful');
   }
